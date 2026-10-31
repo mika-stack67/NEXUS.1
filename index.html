@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nexus</title>
+<meta name="description" content="Nexus – eine kleine KI, komplett selbst gebaut und trainiert. Für Windows, Android und iPhone.">
+<meta name="theme-color" content="#d9821b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: Produktseite einer kleinen App – großer Einstieg mit echtem Gesprächsausschnitt, dann Download-Karten je Gerät */
+:root {
+  --grund: #eef2f5;
+  --flaeche: #fbfcfd;
+  --tinte: #1b2633;
+  --leise: #5d6b7a;
+  --linie: #d4dce4;
+  --ki: #d9821b;
+  --ki-tief: #a85f0c;
+  --ki-hell: #fbeedd;
+  --du: #1f3a52;
+  --du-text: #f4f7fa;
+  --font-titel: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-zahl: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --grund: #0f151c; --flaeche: #161f29; --tinte: #e1e8ef; --leise: #94a3b3; --linie: #263241;
+          --ki: #f2a33a; --ki-tief: #f6b860; --ki-hell: #2a2216; --du: #2b5375; --du-text: #f1f5f9; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--grund); color: var(--tinte); font: 16px/1.6 var(--font-text);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.rahmen { max-width: 1080px; margin: 0 auto; }
+a { color: var(--ki-tief); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ki); outline-offset: 3px; }
+
+/* Kopfzeile */
+.kopf { display: flex; align-items: center; gap: 12px; padding-block: 18px; }
+.marke { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--tinte); font: 800 20px var(--font-titel); }
+.marke img { width: 34px; height: 34px; border-radius: 9px; }
+.navi { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; font-size: 15px; }
+.navi a { color: var(--leise); text-decoration: none; }
+.navi a:hover { color: var(--tinte); }
+
+/* Einstieg */
+.einstieg { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; padding-block: 40px 64px; }
+@media (max-width: 860px) { .einstieg { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 16px 48px; } }
+.kicker { font: 600 13px var(--font-zahl); letter-spacing: .08em; text-transform: uppercase; color: var(--ki-tief); margin: 0 0 14px; }
+h1 { font: 800 clamp(40px, 7vw, 72px)/1.02 var(--font-titel); letter-spacing: -0.03em; margin: 0 0 20px; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--ki); }
+.einleitung { font-size: 18px; color: var(--leise); max-width: 52ch; margin: 0 0 28px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 12px; }
+.knopf { display: inline-flex; align-items: center; gap: 8px; font: 700 16px var(--font-text); padding: 14px 20px; border-radius: 12px; text-decoration: none; border: 2px solid transparent; cursor: pointer; }
+.knopf.voll { background: var(--ki); color: #1b1206; }
+.knopf.voll:hover { background: var(--ki-tief); color: #fff; }
+.knopf.rand { border-color: var(--linie); color: var(--tinte); background: var(--flaeche); }
+.knopf.rand:hover { border-color: var(--leise); }
+.klein { font-size: 13px; color: var(--leise); margin-top: 12px; }
+
+/* Gesprächsausschnitt */
+.gespraech { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 20px; padding: 18px; display: grid; gap: 10px; box-shadow: 0 20px 50px -30px rgba(15, 25, 40, .45); }
+.gespraech .titel { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--linie); font: 700 15px var(--font-titel); }
+.gespraech .titel img { width: 26px; height: 26px; border-radius: 7px; }
+.gespraech .titel span { margin-left: auto; font: 12px var(--font-zahl); color: var(--leise); font-weight: 400; }
+.blase { max-width: 85%; padding: 9px 13px; border-radius: 15px; font-size: 15px; }
+.blase.du { justify-self: end; background: var(--du); color: var(--du-text); border-bottom-right-radius: 4px; }
+.blase.ki { justify-self: start; background: var(--grund); border: 1px solid var(--linie); border-bottom-left-radius: 4px; }
+.gespraech .echt { font: 12px var(--font-zahl); color: var(--leise); }
+
+/* Abschnitte */
+section.teil { padding-block: 56px; border-top: 1px solid var(--linie); }
+h2 { font: 800 clamp(28px, 4vw, 40px)/1.1 var(--font-titel); letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+.unter { color: var(--leise); margin: 0 0 32px; max-width: 60ch; }
+.karten { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 860px) { .karten { grid-template-columns: minmax(0, 1fr); } }
+.karte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 16px; padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.karte h3 { font: 700 20px var(--font-titel); margin: 0; display: flex; align-items: baseline; gap: 10px; }
+.karte h3 small { font: 12px var(--font-zahl); color: var(--leise); font-weight: 400; }
+.karte ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.karte .hinweis { font-size: 13px; color: var(--leise); margin: 0; }
+.karte.du-bist-hier { border-color: var(--ki); box-shadow: 0 0 0 3px var(--ki-hell); }
+.marker { font: 600 11px var(--font-zahl); text-transform: uppercase; letter-spacing: .08em; color: var(--ki-tief); }
+
+/* Zahlen */
+.zahlen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 860px) { .zahlen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.zahl b { display: block; font: 800 clamp(28px, 4vw, 40px)/1.1 var(--font-titel); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.zahl span { color: var(--leise); font-size: 14px; }
+
+.zwei { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 860px) { .zwei { grid-template-columns: minmax(0, 1fr); } }
+.zwei ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.lizenzen { font-size: 14px; color: var(--leise); display: grid; gap: 6px; max-width: 75ch; }
+footer { padding-block: 32px max(32px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--linie); color: var(--leise); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+</style>
+</head>
+<body>
+<div class="rahmen">
+  <header class="kopf">
+    <a class="marke" href="./"><img src="icon-192.png" alt="">Nexus</a>
+    <nav class="navi" aria-label="Seiten-Navigation">
+      <a href="#download">Download</a>
+      <a href="#unter-der-haube">Unter der Haube</a>
+      <a href="#lizenzen">Lizenzen</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="einstieg">
+      <div>
+        <p class="kicker">Eigene KI · selbst gebaut und trainiert</p>
+        <h1>Nexus. Eine KI, die nicht aus der <em>Cloud</em> kommt.</h1>
+        <p class="einleitung">Ein kleines Sprachmodell, von Grund auf programmiert und auf einer einzigen Grafikkarte trainiert. Nexus läuft direkt auf deinem Gerät: ohne Konto, ohne Server, nach dem ersten Laden sogar offline.</p>
+        <div class="knoepfe">
+          <a class="knopf voll" href="app.html">Im Browser starten</a>
+          <a class="knopf rand" id="windows-link" href="Nexus-Windows.zip">Für Windows herunterladen</a>
+          <button class="knopf rand" id="installieren" type="button" hidden>Als App installieren</button>
+        </div>
+        <p class="klein">Windows-Download ca. 42 MB · Handy: über den Browser installieren, siehe unten.</p>
+      </div>
+
+      <div class="gespraech" aria-label="Beispiel-Gespräch mit Nexus">
+        <div class="titel"><img src="icon-192.png" alt="">Nexus <span>läuft lokal</span></div>
+        <div class="blase du">Hallo!</div>
+        <div class="blase ki">Hallo! Wie kann ich dir helfen?</div>
+        <div class="blase du">Erzähl mir einen Witz</div>
+        <div class="blase ki">Was macht ein Pirat am Computer? Er drückt die Enter-Taste.</div>
+        <div class="blase du">Wie geht es dir?</div>
+        <div class="blase ki">Als KI habe ich keine Gefühle, aber ich bin bereit zum Reden. Und wie geht es dir?</div>
+        <span class="echt">Echte Antworten von Nexus, nicht geschönt</span>
+      </div>
+    </section>
+
+    <section class="teil" id="download">
+      <h2>Auf dein Gerät holen</h2>
+      <p class="unter">Nexus gibt es für Windows als Programm und für Handys als App, die du direkt aus dem Browser installierst. Ein App-Store ist nicht nötig.</p>
+      <div class="karten">
+        <article class="karte" id="karte-windows">
+          <span class="marker" hidden>Dein Gerät</span>
+          <h3>Windows <small>10 / 11</small></h3>
+          <ol>
+            <li><a id="windows-link-2" href="Nexus-Windows.zip">Nexus-Windows.zip</a> herunterladen</li>
+            <li>Rechtsklick auf die Datei → <b>Alle extrahieren</b></li>
+            <li>Im Ordner <b>Nexus.exe</b> doppelklicken</li>
+          </ol>
+          <p class="hinweis">Windows warnt bei neuen Programmen ohne teure Signatur: <b>Weitere Informationen → Trotzdem ausführen</b>. Die Windows-Version kann zusätzlich im Internet nachschauen: Wikipedia, Wörterbuch, Wetter und Nachrichten.</p>
+        </article>
+        <article class="karte" id="karte-android">
+          <span class="marker" hidden>Dein Gerät</span>
+          <h3>Android</h3>
+          <ol>
+            <li>Diese Seite in <b>Chrome</b> öffnen</li>
+            <li><b>Im Browser starten</b> antippen</li>
+            <li>Menü <b>⋮</b> → <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b></li>
+          </ol>
+          <p class="hinweis">Beim ersten Start lädt Nexus ihr Gehirn (ca. 43 MB, am besten im WLAN). Danach geht sie auch offline.</p>
+        </article>
+        <article class="karte" id="karte-iphone">
+          <span class="marker" hidden>Dein Gerät</span>
+          <h3>iPhone / iPad</h3>
+          <ol>
+            <li>Diese Seite in <b>Safari</b> öffnen</li>
+            <li><b>Im Browser starten</b> antippen</li>
+            <li>Teilen-Symbol → <b>Zum Home-Bildschirm</b></li>
+          </ol>
+          <p class="hinweis">Auf älteren iPhones schreibt Nexus etwas langsamer. Das ist normal, die ganze KI rechnet auf dem Handy selbst.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="teil" id="unter-der-haube">
+      <h2>Unter der Haube</h2>
+      <p class="unter">Nexus ist ein Transformer wie GPT-2, nur kleiner. Sie hat erst Wikipedia gelesen, dann Gespräche geübt. Den Bauplan, das Training und diese App hat Mika selbst gebaut.</p>
+      <div class="zahlen">
+        <div class="zahl"><b>34 Mio.</b><span>Parameter („Gehirnzellen“)</span></div>
+        <div class="zahl"><b>14.631</b><span>Trainingsschritte Grundwissen</span></div>
+        <div class="zahl"><b>1 GB</b><span>deutsche Wikipedia gelesen</span></div>
+        <div class="zahl"><b>1</b><span>Grafikkarte: Radeon RX 6650 XT</span></div>
+      </div>
+      <div class="zwei" style="margin-top:40px">
+        <div class="karte">
+          <h3>Was sie gut kann</h3>
+          <ul>
+            <li>Smalltalk: Hallo sagen, Witze, über sich erzählen</li>
+            <li>Kurze Antworten auf einfache Fragen</li>
+            <li>Komplett privat: Nichts verlässt dein Gerät</li>
+          </ul>
+        </div>
+        <div class="karte">
+          <h3>Was sie (noch) nicht kann</h3>
+          <ul>
+            <li>Fakten stimmen oft nicht. Bitte nichts davon ungeprüft glauben.</li>
+            <li>Rechnen und lange Texte klappen selten</li>
+            <li>Umgangssprache und Tippfehler versteht sie schlecht, daran wird gerade trainiert</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="teil" id="lizenzen">
+      <h2>Quellen und Lizenzen</h2>
+      <div class="lizenzen">
+        <p>Nexus hat aus frei verfügbaren Texten gelernt. Danke an alle, die sie geschrieben haben:</p>
+        <p><a href="https://de.wikipedia.org" rel="noopener">Wikipedia (deutsch)</a>: Texte unter CC BY-SA 4.0 · <a href="https://huggingface.co/datasets/OpenAssistant/OASST-DE" rel="noopener">OpenAssistant OASST-DE</a>: Apache 2.0 · <a href="https://huggingface.co/datasets/argilla/databricks-dolly-15k-curated-multilingual" rel="noopener">Dolly 15k (deutsch)</a>: CC BY-SA 3.0</p>
+        <p>Die Windows-Version fragt bei Bedarf <a href="https://de.wikipedia.org" rel="noopener">Wikipedia</a>, <a href="https://de.wiktionary.org" rel="noopener">Wiktionary</a>, <a href="https://open-meteo.com" rel="noopener">Open-Meteo</a> und <a href="https://www.tagesschau.de" rel="noopener">tagesschau.de</a> ab. Die Inhalte gehören den jeweiligen Seiten.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Nexus · gebaut von Mika</span>
+    <span>Eine kleine KI, die Fehler macht. Bitte freundlich sein.</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  // Auf GitHub Pages zeigt der Windows-Download automatisch auf die neueste Version (GitHub Releases)
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    const nutzer = host.split(".")[0], repo = location.pathname.split("/").filter(Boolean)[0];
+    const url = repo ? `https://github.com/${nutzer}/${repo}/releases/latest/download/Nexus-Windows.zip`
+                     : `https://github.com/${nutzer}/${nutzer}.github.io/releases/latest/download/Nexus-Windows.zip`;
+    document.getElementById("windows-link").href = url;
+    document.getElementById("windows-link-2").href = url;
+  }
+  // Das eigene Gerät hervorheben
+  const ua = navigator.userAgent;
+  const geraet = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ? "iphone"
+               : /Android/.test(ua) ? "android" : /Windows/.test(ua) ? "windows" : null;
+  if (geraet) {
+    const k = document.getElementById("karte-" + geraet);
+    k.classList.add("du-bist-hier"); k.querySelector(".marker").hidden = false;
+  }
+  // "Als App installieren", wenn der Browser es anbietet (Android, Chrome, Edge)
+  let hinweis = null;
+  const knopf = document.getElementById("installieren");
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); hinweis = e; knopf.hidden = false; });
+  knopf.addEventListener("click", async () => { if (!hinweis) return; hinweis.prompt(); await hinweis.userChoice.catch(() => {}); hinweis = null; knopf.hidden = true; });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d9821b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<style>html,body{margin:0}</style>
+</head>
+<body>
+<title>Nexus</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: eine ruhige Chat-Spalte; oben Name + Gehirn-Stand, unten Eingabe, die am Rand klebt */
+:root {
+  --grund: #eef2f5;
+  --flaeche: #fbfcfd;
+  --tinte: #1b2633;
+  --leise: #5d6b7a;
+  --linie: #d4dce4;
+  --ki: #d9821b;
+  --ki-hell: #fbeedd;
+  --du: #1f3a52;
+  --du-text: #f4f7fa;
+  --gut: #2f8a4c;
+  --font-titel: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-zahl: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --grund: #0f151c; --flaeche: #161f29; --tinte: #e1e8ef; --leise: #94a3b3; --linie: #263241;
+    --ki: #f2a33a; --ki-hell: #2a2216; --du: #2b5375; --du-text: #f1f5f9; --gut: #57c27a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --grund: #0f151c; --flaeche: #161f29; --tinte: #e1e8ef; --leise: #94a3b3; --linie: #263241;
+  --ki: #f2a33a; --ki-hell: #2a2216; --du: #2b5375; --du-text: #f1f5f9; --gut: #57c27a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--grund); color: var(--tinte); font: 15px/1.55 var(--font-text);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.app { max-width: 760px; margin: 0 auto; height: 100%; display: grid; grid-template-rows: auto 1fr auto; }
+header { display: flex; align-items: center; gap: 12px; padding-block: 16px 12px; border-bottom: 1px solid var(--linie); flex-wrap: wrap; }
+.zeichen { width: 40px; height: 40px; border-radius: 12px; background: var(--ki); color: #1b1206; display: grid; place-items: center; font: 800 20px var(--font-titel); flex: none; }
+.kopf { display: grid; min-width: 0; flex: 1 1 200px; }
+h1 { margin: 0; font: 800 22px/1.1 var(--font-titel); letter-spacing: -0.01em; }
+.stand { color: var(--leise); font-size: 12.5px; font-family: var(--font-zahl); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.knopf { font: 600 13.5px var(--font-text); color: var(--tinte); background: var(--flaeche); border: 1px solid var(--linie); border-radius: 8px; padding: 7px 11px; cursor: pointer; }
+.knopf:hover { border-color: var(--leise); }
+button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--ki); outline-offset: 2px; }
+main { overflow-y: auto; padding-block: 18px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.nachricht { max-width: 85%; padding: 10px 14px; border-radius: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.nachricht.du { align-self: flex-end; background: var(--du); color: var(--du-text); border-bottom-right-radius: 5px; }
+.nachricht.ki { align-self: flex-start; background: var(--flaeche); border: 1px solid var(--linie); border-bottom-left-radius: 5px; }
+.nachricht.ki.schreibt::after { content: "▍"; color: var(--ki); animation: blinken 1s steps(2) infinite; }
+@keyframes blinken { 50% { opacity: 0; } }
+.meta { align-self: flex-start; font: 12px var(--font-zahl); color: var(--leise); margin-top: -6px; padding-left: 4px; }
+.willkommen { display: grid; gap: 14px; justify-items: start; padding: 8px 2px 4px; }
+.willkommen h2 { margin: 0; font: 700 26px/1.15 var(--font-titel); text-wrap: balance; }
+.willkommen p { margin: 0; color: var(--leise); max-width: 60ch; }
+.vorschlaege { display: flex; flex-wrap: wrap; gap: 8px; }
+.vorschlag { font: 500 14px var(--font-text); background: var(--ki-hell); color: var(--tinte); border: 1px solid transparent; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
+.vorschlag:hover { border-color: var(--ki); }
+.laden { display: grid; gap: 8px; padding: 14px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 12px; }
+.balken { height: 8px; border-radius: 4px; background: var(--linie); overflow: hidden; }
+.balken i { display: block; height: 100%; width: 0; background: var(--ki); transition: width .2s; }
+.laden span { font: 13px var(--font-zahl); color: var(--leise); }
+footer { padding-block: 10px max(14px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--linie); display: grid; gap: 8px; }
+.eingabe { display: flex; gap: 8px; align-items: flex-end; }
+textarea { flex: 1; min-width: 0; resize: none; font: 15px/1.45 var(--font-text); color: var(--tinte); background: var(--flaeche); border: 1px solid var(--linie); border-radius: 12px; padding: 10px 12px; max-height: 140px; }
+.senden { background: var(--ki); color: #1b1206; border: 0; border-radius: 12px; font: 700 14px var(--font-text); padding: 11px 16px; cursor: pointer; }
+.senden:disabled { opacity: .45; cursor: default; }
+.einstellung { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; color: var(--leise); }
+.einstellung input[type="range"] { accent-color: var(--ki); width: 140px; }
+.einstellung output { font-family: var(--font-zahl); }
+.hinweis { font-size: 12px; color: var(--leise); }
+.info { align-self: flex-start; font: 12.5px var(--font-zahl); color: var(--leise); padding-left: 4px; }
+.quelle { align-self: flex-start; font-size: 13px; padding-left: 4px; margin-top: -6px; }
+.quelle a { color: var(--ki); }
+.punkte { align-self: flex-start; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: -4px; padding-left: 2px; }
+.punkte button { font: 600 12.5px var(--font-text); color: var(--leise); background: transparent; border: 1px solid var(--linie); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.punkte button:hover { color: var(--tinte); border-color: var(--leise); }
+.punkte input { font: 13px var(--font-text); color: var(--tinte); background: var(--flaeche); border: 1px solid var(--linie); border-radius: 8px; padding: 5px 8px; min-width: 0; width: min(420px, 70vw); }
+.punkte span { font-size: 12.5px; color: var(--gut); }
+.einstellung input[type="checkbox"] { accent-color: var(--ki); }
+@media (prefers-reduced-motion: reduce) { .nachricht.ki.schreibt::after { animation: none; } .balken i { transition: none; } }
+</style>
+
+<div class="app">
+  <header>
+    <div class="zeichen" aria-hidden="true" id="zeichen">K</div>
+    <div class="kopf">
+      <h1 id="name">Kai</h1>
+      <span class="stand" id="stand">Gehirn wird geladen …</span>
+    </div>
+    <button class="knopf" id="installieren" type="button" hidden>Als App installieren</button>
+    <button class="knopf" id="neu" type="button">Neues Gespräch</button>
+  </header>
+
+  <main id="verlauf" aria-live="polite">
+    <section class="willkommen" id="willkommen">
+      <h2 id="gruss">Hi, ich bin Kai.</h2>
+      <p id="beschreibung">Eine kleine KI, komplett selbst gebaut und trainiert. Ich laufe hier direkt in deinem Browser, ohne Server und ohne Installation.</p>
+      <div class="laden" id="laden">
+        <div class="balken"><i id="ladebalken"></i></div>
+        <span id="ladetext">Lade Gehirn …</span>
+      </div>
+      <div class="vorschlaege" id="vorschlaege" hidden>
+        <button class="vorschlag" type="button">Hallo!</button>
+        <button class="vorschlag" type="button">Wer bist du?</button>
+        <button class="vorschlag" type="button">Was ist 47 + 38?</button>
+        <button class="vorschlag" type="button">Sortiere von klein nach groß: 42, 7, 19</button>
+        <button class="vorschlag" type="button">Erzähl mir einen Witz</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <form class="eingabe" id="formular">
+      <label for="text" class="hinweis" hidden>Nachricht</label>
+      <textarea id="text" rows="1" placeholder="Schreib eine Nachricht …" disabled></textarea>
+      <button class="senden" id="senden" type="submit" disabled>Senden</button>
+    </form>
+    <div class="einstellung">
+      <label for="kreativ">Kreativität</label>
+      <input type="range" id="kreativ" min="0.1" max="1.2" step="0.1" value="0.7">
+      <output id="kreativ-wert">0,7</output>
+      <label id="suche-schalter" hidden><input type="checkbox" id="suche-an" checked> Internet-Suche (Wikipedia)</label>
+      <span class="hinweis">Niedrig = vorsichtig, hoch = verrückter. Kleine KI: Fakten bitte nachprüfen.</span>
+    </div>
+  </footer>
+</div>
+
+<script type="text/plain" id="motor-code">// ===== KI-Motor: Tokenizer + Transformer, komplett in JavaScript =====
+// Läuft im Browser (Web Worker) und zum Testen in Node.
+
+// ---------- Tokenizer (Byte-Level-BPE wie GPT-2) ----------
+function bytesZuZeichen() {
+  const bs = [];
+  for (let i = 33; i <= 126; i++) bs.push(i);
+  for (let i = 161; i <= 172; i++) bs.push(i);
+  for (let i = 174; i <= 255; i++) bs.push(i);
+  const cs = bs.slice();
+  let n = 0;
+  for (let b = 0; b < 256; b++) if (!bs.includes(b)) { bs.push(b); cs.push(256 + n); n++; }
+  const hin = {}, zurueck = {};
+  bs.forEach((b, i) => { hin[b] = String.fromCharCode(cs[i]); zurueck[String.fromCharCode(cs[i])] = b; });
+  return { hin, zurueck };
+}
+
+class Tokenizer {
+  constructor(t) {
+    this.vocab = t.vocab;
+    this.ids = [];
+    for (const [tok, id] of Object.entries(t.vocab)) this.ids[id] = tok;
+    this.rang = new Map(t.merges.map((m, i) => [m, i]));
+    this.ende = t.ende;
+    const b = bytesZuZeichen(); this.b2z = b.hin; this.z2b = b.zurueck;
+    this.muster = /'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu;
+    this.cache = new Map();
+    this.utf8 = new TextEncoder();
+  }
+  bpe(wort) {
+    if (this.cache.has(wort)) return this.cache.get(wort);
+    let teile = Array.from(wort);
+    while (teile.length > 1) {
+      let best = -1, bestRang = Infinity;
+      for (let i = 0; i < teile.length - 1; i++) {
+        const r = this.rang.get(teile[i] + " " + teile[i + 1]);
+        if (r !== undefined && r < bestRang) { bestRang = r; best = i; }
+      }
+      if (best < 0) break;
+      teile.splice(best, 2, teile[best] + teile[best + 1]);
+    }
+    const ids = teile.map(t => this.vocab[t]).filter(x => x !== undefined);
+    if (this.cache.size < 50000) this.cache.set(wort, ids);
+    return ids;
+  }
+  kodieren(text) {
+    const ids = [];
+    for (const m of text.matchAll(this.muster)) {
+      const wort = Array.from(this.utf8.encode(m[0]), b => this.b2z[b]).join("");
+      ids.push(...this.bpe(wort));
+    }
+    return ids;
+  }
+  bytes(ids) {
+    const out = [];
+    for (const id of ids) {
+      if (id === this.ende) continue;
+      for (const z of this.ids[id] || "") { const b = this.z2b[z]; if (b !== undefined) out.push(b); }
+    }
+    return new Uint8Array(out);
+  }
+  dekodieren(ids) { return new TextDecoder("utf-8").decode(this.bytes(ids)); }
+}
+
+// ---------- Transformer ----------
+function erf(x) {  // Abramowitz & Stegun 7.1.26
+  const s = x < 0 ? -1 : 1; x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+
+class Gehirn {
+  constructor(info, puffer) {
+    const e = info.einstellungen;
+    this.L = e.n_ebenen; this.H = e.n_koepfe; this.D = e.n_breite; this.K = e.kontext; this.V = info.vokabular;
+    this.t = {};
+    for (const [name, t] of Object.entries(info.tensoren)) {
+      const n = t.form.reduce((a, b) => a * b, 1);
+      if (t.typ === "i8") this.t[name] = { w: new Int8Array(puffer, t.offset, n), s: new Float32Array(puffer, t.skalen, t.form[0]), zeilen: t.form[0], spalten: t.form[1] };
+      else this.t[name] = { f: new Float32Array(puffer, t.offset, n) };
+    }
+    const D = this.D;
+    this.kCache = []; this.vCache = [];
+    for (let l = 0; l < this.L; l++) { this.kCache.push(new Float32Array(this.K * D)); this.vCache.push(new Float32Array(this.K * D)); }
+    this.pos = 0;
+    this.x = new Float32Array(D); this.h = new Float32Array(D); this.qkv = new Float32Array(3 * D);
+    this.att = new Float32Array(D); this.tmp = new Float32Array(D); this.mlp = new Float32Array(4 * D);
+    this.scores = new Float32Array(this.K); this.logits = new Float32Array(this.V);
+  }
+  zuruecksetzen() { this.pos = 0; }
+  // y = W·x (+ b), W als int8 mit Maßstab pro Zeile
+  matvec(name, x, y, bias) {
+    const T = this.t[name], w = T.w, s = T.s, n = T.spalten, b = bias ? this.t[bias].f : null;
+    for (let o = 0, off = 0; o < T.zeilen; o++, off += n) {
+      let sum = 0;
+      for (let i = 0; i < n; i++) sum += w[off + i] * x[i];
+      y[o] = sum * s[o] + (b ? b[o] : 0);
+    }
+  }
+  layernorm(x, y, name) {
+    const g = this.t[name + ".weight"].f, b = this.t[name + ".bias"].f, D = this.D;
+    let m = 0; for (let i = 0; i < D; i++) m += x[i]; m /= D;
+    let v = 0; for (let i = 0; i < D; i++) { const d = x[i] - m; v += d * d; } v /= D;
+    const r = 1 / Math.sqrt(v + 1e-5);
+    for (let i = 0; i < D; i++) y[i] = (x[i] - m) * r * g[i] + b[i];
+  }
+  // Ein Wortstück einspeisen; mitLogits=true liefert die Wahrscheinlichkeiten fürs nächste
+  schritt(id, mitLogits) {
+    const D = this.D, H = this.H, hd = D / H, p = this.pos, x = this.x;
+    const we = this.t["wort_einbettung.weight"], pe = this.t["positions_einbettung.weight"];
+    for (let i = 0; i < D; i++) x[i] = we.w[id * D + i] * we.s[id] + pe.w[p * D + i] * pe.s[p];
+    for (let l = 0; l < this.L; l++) {
+      const pre = "bloecke." + l + ".";
+      this.layernorm(x, this.h, pre + "norm1");
+      this.matvec(pre + "aufmerksamkeit.qkv.weight", this.h, this.qkv, pre + "aufmerksamkeit.qkv.bias");
+      const K = this.kCache[l], Vc = this.vCache[l];
+      K.set(this.qkv.subarray(D, 2 * D), p * D); Vc.set(this.qkv.subarray(2 * D, 3 * D), p * D);
+      const skala = 1 / Math.sqrt(hd);
+      for (let h = 0; h < H; h++) {
+        const q0 = h * hd;
+        let max = -Infinity;
+        for (let t = 0; t <= p; t++) {
+          let s = 0; const k0 = t * D + q0;
+          for (let i = 0; i < hd; i++) s += this.qkv[q0 + i] * K[k0 + i];
+          s *= skala; this.scores[t] = s; if (s > max) max = s;
+        }
+        let summe = 0;
+        for (let t = 0; t <= p; t++) { const e = Math.exp(this.scores[t] - max); this.scores[t] = e; summe += e; }
+        for (let i = 0; i < hd; i++) this.att[q0 + i] = 0;
+        for (let t = 0; t <= p; t++) {
+          const a = this.scores[t] / summe, v0 = t * D + q0;
+          for (let i = 0; i < hd; i++) this.att[q0 + i] += a * Vc[v0 + i];
+        }
+      }
+      this.matvec(pre + "aufmerksamkeit.ausgabe.weight", this.att, this.tmp, pre + "aufmerksamkeit.ausgabe.bias");
+      for (let i = 0; i < D; i++) x[i] += this.tmp[i];
+      this.layernorm(x, this.h, pre + "norm2");
+      this.matvec(pre + "nachdenken.0.weight", this.h, this.mlp, pre + "nachdenken.0.bias");
+      for (let i = 0; i < 4 * D; i++) { const v = this.mlp[i]; this.mlp[i] = 0.5 * v * (1 + erf(v / Math.SQRT2)); }
+      this.matvec(pre + "nachdenken.2.weight", this.mlp, this.tmp, pre + "nachdenken.2.bias");
+      for (let i = 0; i < D; i++) x[i] += this.tmp[i];
+    }
+    this.pos++;
+    if (!mitLogits) return null;
+    this.layernorm(x, this.h, "norm");
+    this.matvec(this.t["kopf.weight"] ? "kopf.weight" : "wort_einbettung.weight", this.h, this.logits, null);
+    return this.logits;
+  }
+}
+
+function wuerfeln(logits, temperatur, topK) {
+  const n = logits.length, idx = new Int32Array(n);
+  for (let i = 0; i < n; i++) idx[i] = i;
+  const k = Math.min(topK, n);
+  // Teil-Sortierung: die k größten nach vorne
+  const top = Array.from(idx).sort((a, b) => logits[b] - logits[a]).slice(0, k);
+  if (temperatur <= 0.01) return top[0];
+  const max = logits[top[0]];
+  const p = top.map(i => Math.exp((logits[i] - max) / temperatur));
+  let r = Math.random() * p.reduce((a, b) => a + b, 0);
+  for (let j = 0; j < k; j++) { r -= p[j]; if (r <= 0) return top[j]; }
+  return top[k - 1];
+}
+
+if (typeof module !== "undefined") module.exports = { Tokenizer, Gehirn, wuerfeln };
+
+// ---------- Worker: führt das Gespräch ----------
+let tok, gehirn, runden = [], stopp = false, logits = null;
+const pause = () => new Promise(r => setTimeout(r, 0));
+function einspeisen(ids) {
+  for (let i = 0; i < ids.length; i++) logits = gehirn.schritt(ids[i], i === ids.length - 1);
+}
+async function antworten(text, temperatur, laenge, mitQuelle) {
+  const K = gehirn.K, ende = tok.ende;
+  if (mitQuelle) { runden = []; gehirn.pos = -1; }   // Platz für den Quelltext machen
+  const neu = tok.kodieren((runden.length ? "\n" : "") + "Du: " + text + "\nKI:");
+  let alle = runden.flat().concat(neu);
+  const platz = K - laenge;
+  if (alle.length > platz || gehirn.pos !== alle.length - neu.length) {
+    // Zu lang: alte Runden vergessen (höchstens die letzten 4 behalten) und neu einlesen
+    while (runden.length && (runden.length > 4 || runden.flat().length + neu.length > platz)) runden.shift();
+    alle = runden.flat().concat(neu).slice(-platz);
+    gehirn.zuruecksetzen(); einspeisen(alle);
+  } else einspeisen(neu);
+  const antwort = []; let gezeigt = "", start = performance.now(); stopp = false;
+  while (antwort.length < laenge && gehirn.pos < K && !stopp) {
+    for (const w of new Set(antwort)) logits[w] = logits[w] > 0 ? logits[w] / 1.3 : logits[w] * 1.3;   // nicht ständig wiederholen
+    const id = wuerfeln(logits, temperatur, 40);
+    if (id === ende) break;
+    antwort.push(id);
+    let t = tok.dekodieren(antwort);
+    if (t.includes("\nDu:")) { t = t.split("\nDu:")[0]; gezeigt = t; antwort.length = 0; antwort.push(...tok.kodieren(t)); gehirn.pos = -1; break; }
+    if (!t.endsWith("\ufffd")) { gezeigt = t; postMessage({ typ: "teil", text: t.trimStart() }); }
+    logits = gehirn.schritt(id, true);
+    await pause();
+  }
+  const sek = (performance.now() - start) / 1000;
+  runden.push(neu.concat(antwort, [ende]));
+  if (gehirn.pos >= 0 && gehirn.pos < K) gehirn.schritt(ende, false); else gehirn.pos = -1;
+  postMessage({ typ: "fertig", text: gezeigt.trim(), tempo: antwort.length / Math.max(sek, 0.001), prompt: alle, antwort });
+}
+onmessage = async e => {
+  const m = e.data;
+  if (m.typ === "start") {
+    tok = new Tokenizer(m.info.tokenizer); gehirn = new Gehirn(m.info, m.puffer);
+    postMessage({ typ: "bereit" });
+  } else if (m.typ === "frage") await antworten(m.text, m.temperatur, m.laenge, m.mitQuelle);
+  else if (m.typ === "kodiere") postMessage({ typ: "kodiert", nr: m.nr, ids: tok.kodieren(m.text) });
+  else if (m.typ === "stopp") stopp = true;
+  else if (m.typ === "neu") { runden = []; gehirn.zuruecksetzen(); }
+};
+</script>
+
+<script>
+(() => {
+  const TEILE = null;
+  const DESKTOP = false;   // true in der Nexus.exe: Internet-Suche und Punkte geben
+  const $ = id => document.getElementById(id);
+  const verlaufEl = $("verlauf"), text = $("text"), senden = $("senden");
+  let worker, aktiv = false, kiBlase = null, info = null;
+
+  const kreativ = $("kreativ");
+  try { const k = localStorage.getItem("ki-kreativ"); if (k) kreativ.value = k; } catch (e) {}
+  const zeigeKreativ = () => $("kreativ-wert").textContent = Number(kreativ.value).toLocaleString("de-DE", { minimumFractionDigits: 1 });
+  zeigeKreativ();
+  kreativ.addEventListener("input", () => { zeigeKreativ(); try { localStorage.setItem("ki-kreativ", kreativ.value); } catch (e) {} });
+
+  async function laden() {
+    try {
+      info = await (await fetch("gehirn/gehirn.json", { cache: "no-store" })).json();
+      const name = info.name || "Kai";
+      $("name").textContent = name; $("zeichen").textContent = name[0].toUpperCase();
+      $("gruss").textContent = `Hi, ich bin ${name}.`;
+      $("stand").textContent = `${info.gehirn} · Stand ${info.erstellt}`;
+      const gesamt = info.bytes, puffer = new Uint8Array(gesamt);
+      let geladen = 0;
+      // Ohne feste Liste: Anzahl der 4-MB-Teile aus der Gehirn-Größe ausrechnen
+      const teile = TEILE || Array.from({ length: Math.ceil(gesamt / 4194304) }, (_, i) => "teil-" + i + ".bin");
+      for (const teil of teile) {
+        const antwort = await fetch("gehirn/" + teil + "?v=" + encodeURIComponent(info.erstellt || ""));
+        if (!antwort.ok) throw new Error(teil + " fehlt");
+        const leser = antwort.body.getReader();
+        for (;;) {
+          const { done, value } = await leser.read();
+          if (done) break;
+          puffer.set(value, geladen); geladen += value.length;
+          $("ladebalken").style.width = (100 * geladen / gesamt) + "%";
+          $("ladetext").textContent = `Lade Gehirn … ${(geladen / 1e6).toFixed(0)} von ${(gesamt / 1e6).toFixed(0)} MB`;
+        }
+      }
+      $("ladetext").textContent = "Starte …";
+      const code = $("motor-code").textContent;
+      worker = new Worker(URL.createObjectURL(new Blob([code], { type: "text/javascript" })));
+      worker.onmessage = nachricht;
+      worker.postMessage({ typ: "start", info, puffer: puffer.buffer }, [puffer.buffer]);
+    } catch (fehler) {
+      $("ladetext").textContent = DESKTOP
+        ? "Kein Gehirn gefunden. Führe zuerst 17_reparieren_und_app.bat aus und starte Nexus danach neu."
+        : "Das Gehirn konnte nicht geladen werden: " + fehler.message + ". Lade die Seite neu.";
+    }
+  }
+
+  function blase(art, inhalt) {
+    const d = document.createElement("div");
+    d.className = "nachricht " + art; d.textContent = inhalt;
+    verlaufEl.appendChild(d); verlaufEl.scrollTop = verlaufEl.scrollHeight;
+    return d;
+  }
+
+  // ---------- Nur in der Desktop-App ----------
+  const wartend = new Map(); let nr = 0, quelleAktuell = null;
+  const kodieren = t => new Promise(r => { nr++; wartend.set(nr, r); worker.postMessage({ typ: "kodiere", text: t, nr }); });
+  const FRAGE_ANFAENGE = ["was weißt du über", "was weisst du über", "erzähl mir etwas über", "erzähl mir was über",
+    "erzähl was über", "erzähle mir etwas über", "was ist", "was sind", "was war", "wer ist", "wer war", "wer sind",
+    "wer waren", "was bedeutet", "erkläre mir", "erkläre", "erklär mir", "erklär", "wo liegt", "wo ist", "wie funktioniert", "was macht"];
+  const ARTIKEL = ["der ", "die ", "das ", "ein ", "eine ", "einen ", "einem ", "den ", "dem ", "des "];
+  function suchbegriff(frage) {
+    const t = frage.trim().replace(/[?!. ]+$/, ""), klein = t.toLowerCase();
+    if (klein.startsWith("suche:")) return t.slice(6).trim() || null;
+    if (/\d/.test(t)) return null;
+    for (const a of FRAGE_ANFAENGE) {
+      if (!klein.startsWith(a + " ")) continue;
+      let rest = t.slice(a.length).trim();
+      for (const ar of ARTIKEL) if (rest.toLowerCase().startsWith(ar)) { rest = rest.slice(ar.length); break; }
+      rest = rest.trim();
+      if (["du", "dein name", "das", "los", "dir"].includes(rest.toLowerCase())) return null;
+      return rest || null;
+    }
+    return null;
+  }
+  function ersteSaetze(text, max) {
+    text = text.split("\n\n")[0].split(/\s+/).join(" ").trim();
+    const re = /(?<=[a-zäöüß0-9\)\]])[.!?](?=\s+[A-ZÄÖÜ„])/g;
+    let erg = "", start = 0, m, abgebrochen = false;
+    while ((m = re.exec(text))) {
+      const vor = (text.slice(0, m.index).split(" ").pop() || "").replace(/^\(+/, "");
+      if (vor.length <= 3) continue;
+      const satz = text.slice(start, m.index + 1).trim();
+      if (erg && erg.length + satz.length + 1 > max) { abgebrochen = true; break; }
+      erg = (erg + " " + satz).trim(); start = m.index + 1;
+      if (erg.length >= max) { abgebrochen = true; break; }
+    }
+    if (!abgebrochen) { const rest = text.slice(start).trim(); if (/[.!?]$/.test(rest) && (!erg || erg.length + rest.length + 1 <= max)) erg = (erg + " " + rest).trim(); }
+    return erg || text.slice(0, max);
+  }
+  function zeile(klasse, inhalt) {
+    const d = document.createElement("div"); d.className = klasse;
+    if (typeof inhalt === "string") d.textContent = inhalt; else d.appendChild(inhalt);
+    verlaufEl.appendChild(d); verlaufEl.scrollTop = verlaufEl.scrollHeight; return d;
+  }
+  async function speichern(eintrag, leiste) {
+    try {
+      const r = await (await fetch("/bewertung", { method: "POST", body: JSON.stringify(eintrag) })).json();
+      leiste.innerHTML = ""; const s = document.createElement("span");
+      s.textContent = `Gemerkt! ${r.anzahl} Bewertungen gesammelt`; leiste.appendChild(s);
+    } catch (e) { leiste.textContent = "Konnte nicht gespeichert werden."; }
+  }
+  function punkteLeiste(prompt, antwort) {
+    const leiste = zeile("punkte", document.createTextNode(""));
+    for (const [titel, art] of [["Gut", "gut"], ["Schlecht", "schlecht"], ["Besser …", "besser"]]) {
+      const b = document.createElement("button"); b.type = "button"; b.textContent = titel;
+      b.addEventListener("click", () => {
+        if (art !== "besser") return speichern({ art, prompt, antwort }, leiste);
+        leiste.innerHTML = "";
+        const feld = document.createElement("input"); feld.placeholder = "So wäre die Antwort richtig …"; feld.id = "besser-" + Date.now();
+        const ok = document.createElement("button"); ok.type = "button"; ok.textContent = "Speichern";
+        const los = async () => { if (!feld.value.trim()) return; speichern({ art: "besser", prompt, antwort, besser: await kodieren(" " + feld.value.trim()) }, leiste); };
+        ok.addEventListener("click", los); feld.addEventListener("keydown", e => { if (e.key === "Enter") los(); });
+        leiste.append(feld, ok); feld.focus();
+      });
+      leiste.appendChild(b);
+    }
+  }
+
+  function nachricht(e) {
+    const m = e.data;
+    if (m.typ === "kodiert") { wartend.get(m.nr)(m.ids); wartend.delete(m.nr); return; }
+    if (m.typ === "bereit") {
+      $("laden").hidden = true; $("vorschlaege").hidden = false;
+      text.disabled = false; senden.disabled = false; text.focus();
+    } else if (m.typ === "teil") {
+      kiBlase.textContent = m.text; verlaufEl.scrollTop = verlaufEl.scrollHeight;
+    } else if (m.typ === "fertig") {
+      kiBlase.classList.remove("schreibt");
+      if (!m.text) kiBlase.textContent = "…";
+      const meta = document.createElement("div"); meta.className = "meta";
+      meta.textContent = `${m.tempo.toFixed(1)} Wortstücke/s`;
+      verlaufEl.appendChild(meta);
+      if (quelleAktuell && quelleAktuell.link) {
+        const a = document.createElement("a"); a.href = quelleAktuell.link; a.target = "_blank"; a.rel = "noopener";
+        a.textContent = `Quelle: ${quelleAktuell.label || "Wikipedia"} – ${quelleAktuell.titel}`;
+        zeile("quelle", a);
+      }
+      if (DESKTOP && m.text) punkteLeiste(m.prompt, m.antwort);
+      aktiv = false; senden.textContent = "Senden"; verlaufEl.scrollTop = verlaufEl.scrollHeight; text.focus();
+    }
+  }
+
+  async function fragen(inhalt) {
+    inhalt = inhalt.trim();
+    if (!inhalt || !worker || aktiv) return;
+    $("willkommen").hidden = true;
+    blase("du", inhalt);
+    aktiv = true; senden.textContent = "Stopp";
+    let nachrichtText = inhalt; quelleAktuell = null;
+    if (DESKTOP && $("suche-an").checked) {
+      // Das Programm wählt die passende Quelle: Wetter, Nachrichten, Wörterbuch oder Wikipedia
+      try {
+        const q = await (await fetch("/suche?frage=" + encodeURIComponent(inhalt))).json();
+        if (q.titel && q.text) {
+          quelleAktuell = q;
+          const text = q.label === "Wikipedia" ? ersteSaetze(q.text, 900) : q.text;
+          zeile("info", `Gelesen: ${q.label} – ${q.titel}`);
+          if (q.label !== "Wikipedia") zeile("info", text);
+          nachrichtText = `Quelle: ${q.label} – ${q.titel}\n${text}\n\nFrage: ${inhalt}`;
+        } else if (q.hinweis) zeile("info", q.hinweis);
+        else if (q.fehler) zeile("info", "Internet-Suche ging nicht (keine Verbindung?) – sie antwortet aus dem Gedächtnis.");
+      } catch (e) { zeile("info", "Internet-Suche ging nicht – sie antwortet aus dem Gedächtnis."); }
+    }
+    kiBlase = blase("ki schreibt", "");
+    worker.postMessage({ typ: "frage", text: nachrichtText, temperatur: Number(kreativ.value), laenge: quelleAktuell ? 200 : 160, mitQuelle: !!quelleAktuell });
+  }
+
+  $("formular").addEventListener("submit", e => {
+    e.preventDefault();
+    if (aktiv) { worker.postMessage({ typ: "stopp" }); return; }
+    const t = text.value; text.value = ""; text.style.height = ""; fragen(t);
+  });
+  text.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("formular").requestSubmit(); } });
+  text.addEventListener("input", () => { text.style.height = "auto"; text.style.height = Math.min(text.scrollHeight, 140) + "px"; });
+  document.querySelectorAll(".vorschlag").forEach(b => b.addEventListener("click", () => { if (!aktiv) fragen(b.textContent); }));
+  $("neu").addEventListener("click", () => {
+    if (aktiv || !worker) return;
+    worker.postMessage({ typ: "neu" });
+    verlaufEl.querySelectorAll(".nachricht, .meta, .info, .quelle, .punkte").forEach(n => n.remove());
+    $("willkommen").hidden = false;
+  });
+  // Installierbar als App (Handy/PC), wenn der Browser es anbietet
+  let installHinweis = null;
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installHinweis = e; $("installieren").hidden = false; });
+  $("installieren").addEventListener("click", async () => {
+    if (!installHinweis) return;
+    installHinweis.prompt(); await installHinweis.userChoice.catch(() => {}); installHinweis = null; $("installieren").hidden = true;
+  });
+  if (DESKTOP) {
+    $("suche-schalter").hidden = false;
+    $("suche-schalter").lastChild.textContent = " Internet (Wikipedia, Wörterbuch, Wetter, Nachrichten)";
+    $("beschreibung").textContent = "Eine kleine KI, komplett selbst gebaut und trainiert. Ich laufe direkt auf deinem PC. Ins Internet gehe ich nur, um in Wikipedia nachzuschauen.";
+    const lebt = () => fetch("/lebt", { method: "POST" }).catch(() => {});
+    lebt(); setInterval(lebt, 10000);
+  }
+  laden();
+})();
+</script>
+
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
+</body>
+</html>
